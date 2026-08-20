@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ahuora": {
+      "type": "http",
+      "url": "https://ahuoratech.app/mcp"
+    }
+  }
+}

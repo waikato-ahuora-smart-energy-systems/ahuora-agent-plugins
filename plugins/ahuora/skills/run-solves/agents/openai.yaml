@@ -1,0 +1,4 @@
+interface:
+  display_name: Run Solves
+  short_description: Plan, start, and monitor Ahuora Solve Runs
+  default_prompt: Preview the solve plan, start the solve at the current revision, and use the returned SolveRun ID to monitor and inspect results.

@@ -1,0 +1,36 @@
+{
+  "name": "ahuora",
+  "version": "0.1.0+codex.20260819035005",
+  "description": "Ahuora workflows for building, debugging, solving, and analysing Ahuora process flowsheets.",
+  "author": {
+    "name": "Ahuora"
+  },
+  "repository": "https://github.com/waikato-ahuora-smart-energy-systems/ahuora-agent-plugins",
+  "keywords": [
+    "process-engineering",
+    "flowsheets",
+    "simulation",
+    "mcp",
+    "production"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Ahuora",
+    "shortDescription": "Build, solve, and assess production Ahuora studies",
+    "longDescription": "Connect Codex to the production Ahuora environment with safe workflows for process flowsheets, solve runs, and economics studies.",
+    "developerName": "Ahuora",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "Inspect an Ahuora flowsheet and identify likely problems.",
+      "Safely build or modify an Ahuora process flowsheet.",
+      "Run an Ahuora solve and analyse its results.",
+      "Build and evaluate an Ahuora economics study."
+    ]
+  }
+}

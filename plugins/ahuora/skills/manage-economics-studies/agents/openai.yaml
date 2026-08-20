@@ -1,0 +1,4 @@
+interface:
+  display_name: Manage Economics Studies
+  short_description: Build and assess typed Ahuora economics studies
+  default_prompt: Inspect, configure, calculate, and compare this Ahuora economics study using exact revisions and durable result-run identities.

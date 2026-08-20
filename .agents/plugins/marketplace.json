@@ -5,6 +5,18 @@
   },
   "plugins": [
     {
+      "name": "ahuora",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ahuora"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "ahuora-staging",
       "source": {
         "source": "local",

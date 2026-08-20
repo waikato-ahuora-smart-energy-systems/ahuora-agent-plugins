@@ -1,0 +1,4 @@
+interface:
+  display_name: Compare Solve Runs
+  short_description: Compare immutable Ahuora Solve Run results
+  default_prompt: Compare these Ahuora Solve Runs using immutable values, compatible units, source revisions, execution scope, and diagnostics.
