@@ -2,7 +2,11 @@
   "mcpServers": {
     "ahuora": {
       "type": "http",
-      "url": "https://ahuoratech.app/mcp"
+      "url": "https://ahuoratech.app/mcp",
+      "scopes": [
+        "ahuora:mcp",
+        "offline_access"
+      ]
     }
   }
 }

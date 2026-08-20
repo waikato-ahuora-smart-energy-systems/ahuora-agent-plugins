@@ -2,7 +2,11 @@
   "mcpServers": {
     "ahuora-staging": {
       "type": "http",
-      "url": "https://staging.ahuoratech.app/mcp"
+      "url": "https://staging.ahuoratech.app/mcp",
+      "scopes": [
+        "ahuora:mcp",
+        "offline_access"
+      ]
     }
   }
 }
