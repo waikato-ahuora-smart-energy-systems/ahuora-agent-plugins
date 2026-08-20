@@ -1,0 +1,20 @@
+{
+  "name": "ahuora",
+  "interface": {
+    "displayName": "Ahuora"
+  },
+  "plugins": [
+    {
+      "name": "ahuora-staging",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ahuora-staging"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

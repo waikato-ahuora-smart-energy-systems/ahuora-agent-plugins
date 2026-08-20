@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ahuora-staging": {
+      "type": "http",
+      "url": "https://staging.ahuoratech.app/mcp"
+    }
+  }
+}

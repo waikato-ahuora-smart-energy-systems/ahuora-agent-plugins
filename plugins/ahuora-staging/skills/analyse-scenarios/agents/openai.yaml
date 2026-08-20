@@ -1,0 +1,4 @@
+interface:
+  display_name: Analyse Scenarios
+  short_description: Build and analyse Ahuora process scenarios
+  default_prompt: Inspect, safely configure, execute, and analyse Ahuora scenarios using revision-bound edits and immutable SolveRun results.

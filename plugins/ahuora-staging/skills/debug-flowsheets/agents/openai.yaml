@@ -1,0 +1,4 @@
+interface:
+  display_name: Debug Flowsheets
+  short_description: Diagnose and correct Ahuora flowsheet problems
+  default_prompt: Diagnose this Ahuora flowsheet from current snapshot and SolveRun evidence, preview the smallest correction, and verify the outcome.
