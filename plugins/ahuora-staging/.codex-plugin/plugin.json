@@ -1,6 +1,6 @@
 {
   "name": "ahuora-staging",
-  "version": "0.1.0+codex.20260820044520",
+  "version": "0.1.0+codex.20260819035005",
   "description": "Ahuora Staging workflows for building, debugging, solving, and analysing Ahuora process flowsheets.",
   "author": {
     "name": "Ahuora"

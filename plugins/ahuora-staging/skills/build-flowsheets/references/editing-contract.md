@@ -56,7 +56,7 @@ Use these operations for intent-level changes:
   effects before apply because variants can change the model contract.
 - `configure_stream` sets a property package, compounds, compound mode, and stream specifications on one source stream. The standard compound-propagation path carries its package and compounds to connected downstream streams. Do not repeat the same package and compound change on each downstream stream.
 - `set_split_fractions` sets explicit outlet fractions; their total must not exceed one.
-- `configure_recycle` selects the tear stream and the state variables fixed at the tear on an existing auto-created recycle. It never creates the recycle object.
+- `configure_recycle` selects the tear stream on an existing auto-created recycle. Omit `fixed_tear_variables` for normal open-loop recycle convergence. Fix a tear property only when a fully closed material circuit needs that physical specification, or for a short-lived diagnostic experiment; the fixed property disables its recycle equality and does not converge to the upstream value. It never creates the recycle object.
 - `replace_control` exchanges one current fixed property for one structurally valid free property. Use the fixed property as `manipulated_id`, the free property as `set_point_id`, and keep `structural_validation_bypassed` false.
 - Use `set_property_value` only when the exact property-value ID came from the current snapshot, and never use it to change `enabled`.
 

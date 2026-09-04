@@ -5,6 +5,12 @@ description: Preview, start, monitor, inspect, and cancel Ahuora solves using du
 
 # Run Solves
 
+In user-facing text, use each returned name, label, display name, or run number
+with clear process context. Use raw database IDs only for tool calls and exact
+matching. Show an ID to the user only when they ask for it, it resolves real
+ambiguity, or no useful name exists. Put it after the plain-language reference,
+and never invent a name.
+
 1. Call `set_agent_task_purpose`, then call `get_client_permissions` and
    `get_capabilities`; require solve permission. Django creates and renews the
    visible session from the JWT.
@@ -45,3 +51,21 @@ Planning failures return `code`, `stage`, `retryable`, `detail`, `field_errors`,
 Read [the SolveRun contract](references/solve-run-contract.md) before interpreting state.
 Read [the client permission workflow](../../references/client-permission-workflow.md)
 before you request access.
+
+## Result reads
+
+`get_solve_run_results` returns at most 25 property rows and 5,000 stored
+values in one response page. For a dense indexed result, set `pageSize: 1` and
+filter by `propertyValueId` when the property is known. Reduce the page size or
+add a property or owner filter when the API reports that a page contains too
+many values.
+
+An execution-run scalar has `axes: []`. A one-axis result includes its exact
+time, space, or stage coordinates. Treat those coordinates as part of the
+result identity; do not compare or combine vectors that use different axes.
+
+An aggregate multi-steady-state result has `axes: null` and parallel
+`solve_indexes` and `child_solve_run_ids`. Aggregate reads contain scalar child
+results only. To inspect an indexed result from a multi-steady-state solve,
+call `list_solve_run_children`, then call `get_solve_run_results` for each
+required child Solve Run.
