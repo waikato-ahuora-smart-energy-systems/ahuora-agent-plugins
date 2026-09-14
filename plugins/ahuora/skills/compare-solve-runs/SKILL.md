@@ -5,6 +5,12 @@ description: Compare immutable results, provenance, statuses, and diagnostics fr
 
 # Compare Solve Runs
 
+In user-facing text, use each returned name, label, display name, or run number
+with clear process context. Use raw database IDs only for tool calls and exact
+matching. Show an ID to the user only when they ask for it, it resolves real
+ambiguity, or no useful name exists. Put it after the plain-language reference,
+and never invent a name.
+
 1. Call `set_agent_task_purpose`, then call `get_client_permissions` and confirm
    read capability for each flowsheet. Django creates and renews the visible
    session from the JWT.
