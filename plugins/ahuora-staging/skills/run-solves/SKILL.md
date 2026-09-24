@@ -5,6 +5,8 @@ description: Preview, start, monitor, inspect, and cancel Ahuora solves using du
 
 # Run Solves
 
+For P-Graph alternative processes, use [analyse-pgraph-alternatives](../analyse-pgraph-alternatives/SKILL.md) for decision modes, generation, structure and row identities, and applying a solved alternative.
+
 In user-facing text, use each returned name, label, display name, or run number
 with clear process context. Use raw database IDs only for tool calls and exact
 matching. Show an ID to the user only when they ask for it, it resolves real
@@ -25,7 +27,7 @@ and never invent a name.
 7. Use `preview_solve_plan` only when the user wants a true subset of the flowsheet. Resolve blockers and retain its execution-plan signature.
 8. Call `start_solve` with a fresh request ID and the exact current content revision. For a subset, pass the same selection intent and the validated execution-plan signature. Retain the returned SolveRun ID. Omit `performDiagnostics` or set it to `false` for normal and iterative solves. Set it to `true` only when the user needs the full IDAES diagnostic suite: on a large model or a poor initial point, those checks can take much longer than the solve and consume most of the same task time limit.
 9. Use `get_solve_run` for durable progress and outcome. For a long-running solve, give the user periodic updates from both progress layers: the current phase or unit-initialisation stage, and the latest solver iteration, objective, primal infeasibility, and convergence health. Do not report only that the task is still running.
-10. Use `list_solve_run_children` for aggregate multi-steady-state rows. For a running child whose detailed iterations are needed, call `enable_solve_run_convergence_stream`, then inspect its updated `get_solve_run` progress.
+10. Use `list_solve_run_children` for P-Graph alternatives or aggregate multi-steady-state rows. For a multi-period P-Graph run, traverse alternatives first, then each structure’s rows. For a running child whose detailed iterations are needed, call `enable_solve_run_convergence_stream`, then inspect its updated `get_solve_run` progress.
 11. If an iteration has `restoration_mode: true`, or convergence health is `restoring`, tell the user at once. IPOPT entered recovery to seek feasibility; this usually indicates that the solve is in trouble. It can recover, so keep the wording diagnostic, but watch whether primal infeasibility improves and whether health becomes stalled or diverging.
 12. Read immutable outputs with `get_solve_run_results` and findings with `get_solve_run_diagnostics`.
 13. For a solve with recycle cuts, call `get_solve_run_recycle_cut_report` and inspect calculated-versus-captured closure errors.

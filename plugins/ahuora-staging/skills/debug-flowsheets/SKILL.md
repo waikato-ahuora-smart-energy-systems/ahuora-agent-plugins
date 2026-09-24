@@ -5,6 +5,8 @@ description: Diagnose Ahuora flowsheet structure and solve failures using snapsh
 
 # Debug Flowsheets
 
+For P-Graph alternative processes, use [analyse-pgraph-alternatives](../analyse-pgraph-alternatives/SKILL.md) for decision modes, generation, structure and row identities, and applying a solved alternative.
+
 In user-facing text, use each returned name, label, display name, or run number
 with clear process context. Use raw database IDs only for tool calls and exact
 matching. Show an ID to the user only when they ask for it, it resolves real

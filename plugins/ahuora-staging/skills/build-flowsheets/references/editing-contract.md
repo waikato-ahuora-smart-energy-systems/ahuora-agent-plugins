@@ -20,7 +20,7 @@
 Use these operations for intent-level changes:
 
 - `add_unit` creates a non-stream process unit and its normal port streams. It must not create a recycle object. For a new downstream unit, connect its generated inlet to the current upstream stream and let the preview merge the generated inlet stream. Keep generated outlet streams as boundary streams until another unit connection merges them.
-- `insert_unit` places a catalog unit with exactly one inlet and one outlet into an already connected material stream. It splits the stream in series and does not create a branch decision node or standalone streams.
+- `insert_unit` places a catalog unit with exactly one inlet and one outlet into an already connected material stream. It splits the stream in series and does not create a branch decision stream or standalone streams.
 - `insert_unit_port_pair` places one named inlet/outlet side of an existing multi-sided unit into an already connected material stream. Use it once for each heat-exchanger side. It consumes that inlet's factory stream, keeps that outlet's factory stream, and does not create a decision-node branch.
 - `connect_port` follows normal canvas merge semantics. Use it to close a material loop by connecting the return stream to the receiving unit's generated inlet. That merge creates the recycle object automatically. Joining a generated boundary stream to an intermediate stream creates a branch. Use `insert_unit` or `insert_unit_port_pair` for series insertion instead.
 - `delete_objects` bins up to 100 current objects as one previewed change. Read
@@ -36,9 +36,12 @@ Use these operations for intent-level changes:
   effects in the preview.
 - `add_port` adds one named port to a current object and can attach it to one
   current stream. Use catalog and snapshot port keys; do not invent them.
-- `convert_stream_to_decision_node` turns one eligible branch stream into a
-  decision node. `merge_decision_nodes` keeps `active_node_id` and merges
-  `merged_node_id` into it. Verify the retained node and all rewired ports.
+- `convert_stream_to_decision_stream` marks one connected material stream as a
+  decision stream. Set `update_object.changes.decision_mode` to `exclusive` or
+  `mixed`. Use `merge_streams` to join current decision streams. Both must use
+  the same mode and property package. Stream 2 keeps its identity and settings;
+  all producers and consumers share the merged material. A unit cannot consume
+  and produce that same material. Inspect all new route combinations in the preview.
 - `insert_translator` inserts Ahuora's translator on one eligible stream when a
   package boundary needs it. Read back both new stream segments and packages.
 - `set_property` selects one value by object, property key, property index, and named indexes. Use it to change an allowed value, formula, display value, or tag; never use it to change `enabled`.

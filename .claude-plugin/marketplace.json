@@ -1,0 +1,21 @@
+{
+  "name": "ahuora",
+  "owner": {
+    "name": "Ahuora"
+  },
+  "metadata": {
+    "description": "Ahuora process flowsheet workflows for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "ahuora",
+      "source": "./plugins/ahuora",
+      "description": "Ahuora workflows for building, debugging, solving, and analysing Ahuora process flowsheets."
+    },
+    {
+      "name": "ahuora-staging",
+      "source": "./plugins/ahuora-staging",
+      "description": "Ahuora Staging workflows for building, debugging, solving, and analysing Ahuora process flowsheets."
+    }
+  ]
+}

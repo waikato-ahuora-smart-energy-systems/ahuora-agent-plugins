@@ -1,0 +1,25 @@
+{
+  "name": "ahuora-staging",
+  "version": "0.1.0-f7cce516169e",
+  "description": "Ahuora Staging workflows for building, debugging, solving, and analysing Ahuora process flowsheets.",
+  "author": {
+    "name": "Ahuora"
+  },
+  "repository": "https://github.com/waikato-ahuora-smart-energy-systems/ahuora-agent-plugins",
+  "keywords": [
+    "process-engineering",
+    "flowsheets",
+    "simulation",
+    "mcp",
+    "staging"
+  ],
+  "mcpServers": {
+    "ahuora-staging": {
+      "type": "http",
+      "url": "https://staging.ahuoratech.app/mcp",
+      "oauth": {
+        "scopes": "ahuora:mcp offline_access"
+      }
+    }
+  }
+}

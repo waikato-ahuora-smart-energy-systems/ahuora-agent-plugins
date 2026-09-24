@@ -1,0 +1,4 @@
+interface:
+  display_name: "Analyse P-Graph Alternatives"
+  short_description: "Generate, compare, and apply process alternatives"
+  default_prompt: "Use $analyse-pgraph-alternatives to generate and compare Ahuora alternatives, then apply the selected solved structure."

@@ -1,0 +1,25 @@
+{
+  "name": "ahuora",
+  "version": "0.1.0-d0662378db86",
+  "description": "Ahuora workflows for building, debugging, solving, and analysing Ahuora process flowsheets.",
+  "author": {
+    "name": "Ahuora"
+  },
+  "repository": "https://github.com/waikato-ahuora-smart-energy-systems/ahuora-agent-plugins",
+  "keywords": [
+    "process-engineering",
+    "flowsheets",
+    "simulation",
+    "mcp",
+    "production"
+  ],
+  "mcpServers": {
+    "ahuora": {
+      "type": "http",
+      "url": "https://ahuoratech.app/mcp",
+      "oauth": {
+        "scopes": "ahuora:mcp offline_access"
+      }
+    }
+  }
+}
