@@ -5,7 +5,8 @@
 - MCP Tasks may later wrap a call but do not replace the SolveRun record.
 - Keep `solve_status`, `result_status`, and `projection_status` distinct.
 - A repeated `start_solve` with the same request ID and identical revision-bound payload recovers the same response without redispatch.
-- Aggregate multi-steady-state runs own ordered child SolveRuns; inspect children rather than internal child tasks.
+- A P-Graph root owns ordered structure SolveRuns. A multi-period structure owns row SolveRuns. Traverse both levels and read values from the structure or row, not the outer P-Graph root.
+- Generation-only completion means alternatives exist; it does not prove a successful solve.
 - Token/session expiry does not cancel a SolveRun. Cancellation is an explicit
   operation and remains limited to work owned by the same client permission.
 - A full solve uses `start_solve` without subset fields. A subset solve uses a previewed selection and exact execution-plan signature only when fewer than all active units are intended.
