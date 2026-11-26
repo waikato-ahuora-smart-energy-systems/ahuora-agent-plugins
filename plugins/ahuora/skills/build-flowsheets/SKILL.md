@@ -55,6 +55,32 @@ and never invent a name.
 18. Use `list_flowsheet_revisions` to find checkpoints. Before `restore_flowsheet_revision`, save the current experiment if it must remain recoverable, reread the latest revision, and restore only at that exact revision.
 19. On a revision conflict, discard the stale plan, reread, and re-plan. Never retry an old preview without a new read.
 
+## Compressor profiles
+
+A polynomial compressor (`compressor_polynomial` or a `compressor_curve*` type)
+needs a performance profile before it can solve. Readiness reports a missing
+profile as a `performance_map` blocker.
+
+1. Call `get_compressor_profile_catalog` to list the choices:
+   - EN 12900 catalogue maps: fixed coefficients for one refrigerant, at the
+     speeds in `speeds_rps`.
+   - Project profiles (`profile:<id>`): curves that users made in Ahuora, with
+     one combination for each refrigerant and rated speed in Hz.
+   - Draft profiles: listed with `is_draft: true`. They have no curves, so
+     you cannot select them. Ask the user to publish one in Ahuora if needed.
+2. Select one with the `select_compressor_profile` edit operation. The editing
+   contract gives its fields. Never write the profile settings or
+   coefficients with `set_property`.
+3. A selection can switch the compressor's object type, because each kind of
+   profile needs its own model. Each catalogue entry's `object_type` shows the
+   result, and the preview summary names the switch. Ahuora rejects a switch
+   that would remove linked data, such as a variable replacement. Ask the user
+   whether to remove the link, or to select the profile in Ahuora.
+4. To start from a fixed-efficiency `compressor`, first preview
+   `switch_unit_variant` to `compressor_polynomial`.
+
+Agents cannot create or edit profiles yet.
+
 Read [the editing contract](references/editing-contract.md) before constructing a batch.
 Read [the client permission workflow](../../references/client-permission-workflow.md)
 before you request access.

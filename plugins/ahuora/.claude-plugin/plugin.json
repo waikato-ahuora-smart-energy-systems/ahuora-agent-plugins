@@ -1,11 +1,12 @@
 {
   "name": "ahuora",
-  "version": "0.1.0-6dd6ba0a3480",
+  "version": "0.1.0-94c70b62affb",
   "description": "Ahuora workflows for building, debugging, solving, and analysing Ahuora process flowsheets.",
   "author": {
     "name": "Ahuora"
   },
   "repository": "https://github.com/waikato-ahuora-smart-energy-systems/ahuora-agent-plugins",
+  "license": "MIT",
   "keywords": [
     "process-engineering",
     "flowsheets",

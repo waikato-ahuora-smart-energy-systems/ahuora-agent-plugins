@@ -1,6 +1,6 @@
 ---
 name: run-solves
-description: Preview, start, monitor, inspect, and cancel Ahuora solves using durable SolveRun identity and explicit revision checks.
+description: Preview, start, monitor, inspect, stop, and cancel Ahuora solves using durable SolveRun identity and explicit revision checks.
 ---
 
 # Run Solves
@@ -32,6 +32,10 @@ and never invent a name.
 12. Read immutable outputs with `get_solve_run_results` and findings with `get_solve_run_diagnostics`.
 13. For a solve with recycle cuts, call `get_solve_run_recycle_cut_report` and inspect calculated-versus-captured closure errors.
 14. If cancellation is requested and permitted, call `cancel_solve_run` with the SolveRun ID.
+15. To end a running parameter fit or design search early and keep its best trial, call
+    `stop_solve_run` with the SolveRun ID instead. It needs the same permission as a cancel.
+    The run ends as a normal result that says it was stopped, once its best trial passes a
+    full-accuracy check; follow it with `get_solve_run`. Any other run can only be cancelled.
 
 ## Subset selection
 
@@ -54,6 +58,73 @@ Read [the SolveRun contract](references/solve-run-contract.md) before interpreti
 Read [the client permission workflow](../../references/client-permission-workflow.md)
 before you request access.
 
+## Experimental solve options
+
+Each scenario has two experimental options. Both are off by default. Read them
+from `get_scenario` or the flowsheet snapshot.
+
+The user may not know these options exist. In the situations below, suggest the
+option that fits and say what it does. Set an option only with the user's
+permission. Use `update_scenario` with `enable_continuation` or
+`enable_elastic_retry`. A change marks the scenario's earlier results as out of
+date. Use the screen names with the user.
+
+| Screen name | Field | What it does |
+| --- | --- | --- |
+| Ramp to new inputs | `enable_continuation` | Skips initialisation and moves the saved solution to the new inputs. If it finds a limit, it reports how far it got and what stopped it. If it stops for another reason, a finding gives only the share it reached, or says that the saved solution no longer solves. |
+| Find closest solution | `enable_elastic_retry` | After a failed solve, retries with targets and equipment values free to move, then feeds if needed. Optimisation decisions stay fixed. It reports which values cannot be met and how close each can get. This adds solver runs to a failed solve. |
+
+Both options need a steady-state solve of the full flowsheet with `solver_option`
+exactly `ipopt`. Other IPOPT variants do not qualify. Start the solve with
+`scenarioNumber` set to the scenario's `id`. A subset or dynamic solve ignores
+them.
+
+Ramp to new inputs has more conditions:
+
+- `initialization_strategy` is `initialize_new` or `skip`. New scenarios use
+  `initialize_all`, so ask permission for the strategy change and the option
+  together.
+- A single steady-state solve of the full flowsheet has succeeded, and every
+  unit still holds the values it saved. A new unit, restore, or import can break
+  this.
+- The flowsheet has no active integrated model, because that model's unit never
+  holds saved values.
+
+A multi-steady-state solve does not update the saved solution. Each of its rows
+ramps from the last single steady-state solve, so that solve must exist.
+
+If a condition is not met, the solve takes its normal path and reports no error.
+To confirm that an option ran, look in `get_solve_run` progress for
+`solver_continuation` or `solver_elastic_retry`. For a multi-steady-state solve,
+call `list_solve_run_children` and read these fields on each child run, because
+the parent run does not hold them. `solver_elastic_retry` appears only after a
+failed solve. Do not report that an option was used without this evidence.
+
+### When to suggest each option
+
+| Situation | Suggest |
+| --- | --- |
+| A single steady-state solve succeeded, the user changed inputs such as a feed or set point, and the solve now fails | Ramp to new inputs |
+| The user wants to know how far an input can move before something limits it | Ramp to new inputs alone. With both options on, the closest-solution report replaces the ramp's limit report. |
+| A solve fails and a target may be out of reach or may conflict with another value | Find closest solution |
+| The user asks which specified value to change to make the flowsheet solve | Find closest solution |
+| A changed flowsheet fails and the cause is unclear | Both. The ramp runs first, and the closest-solution retry runs if the ramp fails. |
+
+Do not suggest them in these cases:
+
+- **Neither option:** the flowsheet has readiness or degrees-of-freedom blockers,
+  because those need a model fix first. The same applies to dynamic and subset
+  solves, and to a solver other than `ipopt`.
+- **Not Ramp to new inputs:** this is the first solve, only multi-steady-state
+  solves have run, units were added, the flowsheet was restored or imported since
+  its last full solve, or it has an active integrated model. There is no matching
+  solution to start from.
+- **Not Find closest solution:** the user only wants a faster solve. It does
+  nothing unless a solve fails, and then it adds solver runs.
+
+To read what these options find, follow "Specified values that cannot be met"
+in the [debug-flowsheets skill](../debug-flowsheets/SKILL.md).
+
 ## Result reads
 
 `get_solve_run_results` returns at most 25 property rows and 5,000 stored
@@ -71,3 +142,43 @@ An aggregate multi-steady-state result has `axes: null` and parallel
 results only. To inspect an indexed result from a multi-steady-state solve,
 call `list_solve_run_children`, then call `get_solve_run_results` for each
 required child Solve Run.
+
+## Dynamic run results
+
+A dynamic run is one execution Solve Run with no children. Each result is a
+time series on one `time` axis.
+
+- **Long series.** A page of 25 long series holds far more values than one
+  read returns (the `get_solve_run_results` description states the limit).
+  Pass `maxPoints` (4–2,000), and optionally `timeStart` and `timeEnd` in
+  seconds, to `get_solve_run_results`. Each series is cut to the window and
+  thinned, and the limit drops further so the page's time series fit that
+  one value limit; `point_limit` gives the cap each series got. Every group
+  keeps its first, lowest, highest and last point, so peaks and steps
+  survive. `downsampled` is true when thinning dropped points inside the
+  window, and `stored_point_count` is how many points the run stored.
+- **Steady-state results.** A multi-steady-state run has no time axis, so its
+  results refuse `maxPoints`, `timeStart` and `timeEnd`.
+- **Quote the summary.** Each time series has a `summary` taken from every
+  stored point in the window: start and end values, minimum and maximum with
+  their times, and the time-weighted mean. Use it for numbers you report, not
+  the thinned points.
+- **Failed or stopped runs.** Pass `includePartial: true` to read the values a
+  run kept up to where it stopped. Call `get_solve_run_failure_report` for the
+  stage and simulated time of the failure and the input changes near it.
+- **Optimisation.** `get_solve_run_optimization` returns the chosen control
+  schedules and event settings, each objective term with its replayed value,
+  and how each limit ended. Write the schedules back with an
+  `apply_optimised_inputs` edit.
+- **Parameter fit.** For a scenario with goal `match_data`, start a check
+  with `start_solve` and `fitCheckOnly` true, then the fit without it, and
+  read both with `get_solve_run_fit`; follow "Fit a model to measured data"
+  in the analyse-scenarios skill.
+- **Events and inputs.** `get_solve_run_event_history` lists the events that
+  fired. `get_solve_run_input_timeline` shows the inputs the solver received.
+- **Out-of-date results.** `get_solve_run_staleness` says whether edits made
+  since the run started make its results out of date.
+- **Comparing dynamic runs.** `compare_solve_runs` gives point-by-point
+  differences only when both runs have the same time grid, and it refuses
+  comparisons above 5,000 values. For long runs, or runs with different grids,
+  read both with the same window and compare the summaries.

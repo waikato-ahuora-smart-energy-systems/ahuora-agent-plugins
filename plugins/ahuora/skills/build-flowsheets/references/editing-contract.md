@@ -57,6 +57,20 @@ Use these operations for intent-level changes:
 - `switch_unit_variant` changes one current unit to a catalog
   `target_object_type`. Inspect port, property, stream, and solve-invalidation
   effects before apply because variants can change the model contract.
+- `select_compressor_profile` selects the performance profile of one polynomial
+  compressor (`compressor_polynomial` or a `compressor_curve*` type). Set
+  `target` to the object, and `performance_map` to a value from
+  `get_compressor_profile_catalog`. For an EN 12900 catalogue map, use the map
+  id and an optional `speed_rps` from its `speeds_rps`. For a published project
+  profile, use `profile:<id>` and an optional `refrigerant` and `speed_hz` from
+  one of its combinations; without them, the first combination applies. Do not
+  mix the two option sets. A draft profile has no curves and is rejected. The
+  selection can switch the object type, as each catalogue entry's
+  `object_type` shows. The preview summary names any switch. A switch that
+  would remove linked data, such as a variable replacement, is rejected with
+  the list of links. Never write `performance_map`, `speed_map_rps`,
+  `curve_definition`, `acceptable_fluid`, or profile coefficients with
+  `set_property`; Ahuora refuses those writes.
 - `configure_stream` sets a property package, compounds, compound mode, and stream specifications on one source stream. The standard compound-propagation path carries its package and compounds to connected downstream streams. Do not repeat the same package and compound change on each downstream stream.
 - `set_split_fractions` sets explicit outlet fractions; their total must not exceed one.
 - `configure_recycle` selects the tear stream on an existing auto-created recycle. Omit `fixed_tear_variables` for normal open-loop recycle convergence. Fix a tear property only when a fully closed material circuit needs that physical specification, or for a short-lived diagnostic experiment; the fixed property disables its recycle equality and does not converge to the upstream value. It never creates the recycle object.

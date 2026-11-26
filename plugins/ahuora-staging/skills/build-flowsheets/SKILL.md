@@ -45,6 +45,13 @@ and never invent a name.
 10. Never send `enabled` in `set_property`, `set_property_value`, or `configure_stream` changes. Agents must not toggle property enablement. To select a different structural input, call `analyze_flowsheet_structure`, choose one fixed property and one valid free match, and preview `replace_control` with the fixed property as `manipulated_id`, the free property as `set_point_id`, and structural validation enabled. Set the selected input's value only after the replacement exists.
 11. Never use `add_unit` for a catalog entry whose `is_stream` value is true, or for a recycle object. Normal unit creation generates streams on ports whose `creates_stream` value is true. Add the owning unit and inspect its generated streams in the preview. Use `connect_port` only to join boundary feed/product streams or batch-created unit ports. To close a material recycle loop, connect the return stream to the receiving unit's generated inlet with `connect_port`. The normal merge path detects the loop, keeps the correct stream, creates the recycle object, and selects its tear stream. Never add or wire a recycle object yourself. After the loop exists, use `configure_recycle` to change that auto-created recycle's tear. Set `fixed_tear_variables` only for a fully closed material circuit that needs a physical specification, or for a short-lived diagnostic experiment. Each fixed tear property disables its matching recycle equality and does not converge to the upstream value. Do not fix a tear property on an open loop. For debugging, prefer a true subset solve with a previewed execution plan over changing the full flowsheet's recycle equations. `configure_recycle` does not create a recycle. To place a one-inlet, one-outlet unit in an already connected stream, use `insert_unit`. To place one named inlet/outlet side of an existing multi-sided unit, such as a heat exchanger, use `insert_unit_port_pair` once per side. Do not connect a generated port stream directly to an intermediate process stream because normal merge semantics create a branch decision stream.
 12. Form a small, typed batch and call `plan_flowsheet_changes` with a fresh request ID and the observed revision.
+    For a simulation-owned property, send formula, tag, and value changes in
+    separate operations within that batch. Keep `value` and `display_value`
+    together. To replace a formula with a value, clear the formula first. To
+    constrain a control set point without a stored value, set its initial value
+    first, then set the formula. A plain tag label is not a monitoring tag
+    reference; remove such a reference through its own workflow before editing
+    the value directly. A document with no net change fails preview.
     The editing contract lists all supported topology, restore, grouping,
     geometry, expression, template, and unit-variant operations.
 13. Inspect the normalized operations, summary, warnings, default streams, merges, auto-created recycle effects, propagation effects, and solve invalidation. Apply only that preview with `apply_flowsheet_changes`.
@@ -54,6 +61,32 @@ and never invent a name.
 17. Call `check_flowsheet_readiness` and `analyze_flowsheet_structure` before solve work. Resolve value blockers with small typed edits and specification defects with validated replacements. Treat an open-loop fixed-recycle diagnostic as a request to restore the tear equality and use a normal process specification.
 18. Use `list_flowsheet_revisions` to find checkpoints. Before `restore_flowsheet_revision`, save the current experiment if it must remain recoverable, reread the latest revision, and restore only at that exact revision.
 19. On a revision conflict, discard the stale plan, reread, and re-plan. Never retry an old preview without a new read.
+
+## Compressor profiles
+
+A polynomial compressor (`compressor_polynomial` or a `compressor_curve*` type)
+needs a performance profile before it can solve. Readiness reports a missing
+profile as a `performance_map` blocker.
+
+1. Call `get_compressor_profile_catalog` to list the choices:
+   - EN 12900 catalogue maps: fixed coefficients for one refrigerant, at the
+     speeds in `speeds_rps`.
+   - Project profiles (`profile:<id>`): curves that users made in Ahuora, with
+     one combination for each refrigerant and rated speed in Hz.
+   - Draft profiles: listed with `is_draft: true`. They have no curves, so
+     you cannot select them. Ask the user to publish one in Ahuora if needed.
+2. Select one with the `select_compressor_profile` edit operation. The editing
+   contract gives its fields. Never write the profile settings or
+   coefficients with `set_property`.
+3. A selection can switch the compressor's object type, because each kind of
+   profile needs its own model. Each catalogue entry's `object_type` shows the
+   result, and the preview summary names the switch. Ahuora rejects a switch
+   that would remove linked data, such as a variable replacement. Ask the user
+   whether to remove the link, or to select the profile in Ahuora.
+4. To start from a fixed-efficiency `compressor`, first preview
+   `switch_unit_variant` to `compressor_polynomial`.
+
+Agents cannot create or edit profiles yet.
 
 Read [the editing contract](references/editing-contract.md) before constructing a batch.
 Read [the client permission workflow](../../references/client-permission-workflow.md)
